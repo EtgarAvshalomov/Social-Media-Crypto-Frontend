@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { ethers } from 'ethers'
 import { SiweMessage } from 'siwe'
+import { API_URL } from '../apiBase'
 
-const API_URL = 'http://localhost:3000/api'
 const TARGET_CHAIN_ID = '0x13882'
 
 export default function LoginPage({ onLogin }) {
@@ -64,7 +64,7 @@ export default function LoginPage({ onLogin }) {
     try {
       const provider = new ethers.BrowserProvider(window.ethereum)
       const signer = await provider.getSigner()
-      const nonceRes = await fetch(`${API_URL}/auth/nonce`)
+      const nonceRes = await fetch(`${API_URL}/auth/nonce`, { credentials: 'include' })
       if (!nonceRes.ok) throw new Error('Could not reach server')
       const nonce = await nonceRes.text()
 
@@ -118,7 +118,6 @@ export default function LoginPage({ onLogin }) {
           </p>
         </div>
 
-        {/* Steps indicator */}
         <div className="flex items-center gap-2 bg-[#1e2336] border border-white/[0.07] rounded-xl px-5 py-4">
           <div className={`flex items-center gap-2.5 flex-1 ${walletAddress || step === 'connect' ? 'opacity-100' : 'opacity-40'}`}>
             <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-mono font-bold shrink-0 ${

@@ -1,11 +1,8 @@
 import { useState } from 'react'
-
-const API_URL = import.meta.env.VITE_API_URL
+import { API_URL } from '../apiBase'
 
 export default function SettingsModal({ user, onClose, bskyHandle, setBskyHandle, onPhoneVerified }) {
 
-  // Phone change inline state
-  // phoneStep: null | 'enter_phone' | 'enter_code' | 'success'
   const [phoneStep, setPhoneStep] = useState(null)
   const [phoneInput, setPhoneInput] = useState('')
   const [codeInput, setCodeInput]   = useState('')
@@ -20,7 +17,6 @@ export default function SettingsModal({ user, onClose, bskyHandle, setBskyHandle
     if (e.target === e.currentTarget) onClose()
   }
 
-  // ── Bluesky ──────────────────────────────────────────────
   function handleConnectBsky() {
     const width = 500, height = 700;
     const left  = window.screenX + (window.outerWidth  - width)  / 2;
@@ -50,7 +46,6 @@ export default function SettingsModal({ user, onClose, bskyHandle, setBskyHandle
       .catch(() => alert('Failed to start Bluesky login'));
   }
 
-  // ── Phone flow ───────────────────────────────────────────
   function startPhoneChange() {
     setPhoneInput('')
     setCodeInput('')
@@ -103,48 +98,29 @@ export default function SettingsModal({ user, onClose, bskyHandle, setBskyHandle
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Invalid code.')
 
-      // Success — update local display, notify parent if needed
       setPhoneDisplay(phoneInput)
       setPhoneStep('success')
       if (onPhoneVerified) onPhoneVerified(phoneInput)
       setTimeout(() => setPhoneStep(null), 2000)
     } catch (err) {
-      // Wrong code — old number stays in DB, stay on enter_code so they can retry
       setPhoneError(err.message || 'Invalid code. Please try again.')
     } finally {
       setPhoneLoading(false)
     }
   }
 
-  // ── Shared input style ────────────────────────────────────
-  const inputCls = 'w-full px-3 py-2 rounded-lg bg-[#0f1117] border border-white/[0.07] text-[#e8eaf0] text-[13px] outline-none focus:border-[#4f8ef7]/50 transition-colors placeholder:text-[#3d4560]'
-
-  function Toggle({ on, onToggle }) {
-    return (
-      <button
-        onClick={onToggle}
-        className={`relative w-10 h-[22px] rounded-full shrink-0 transition-colors cursor-pointer ${
-          on ? 'bg-[#4f8ef7]/25 border border-[#4f8ef7]/40' : 'bg-white/[0.07] border border-white/10'
-        }`}
-      >
-        <span className={`absolute top-[3px] w-4 h-4 rounded-full transition-all ${
-          on ? 'left-[18px] bg-[#4f8ef7]' : 'left-[3px] bg-[#6b7390]'
-        }`} />
-      </button>
-    )
-  }
+  const inputCls =
+    'w-full px-3 py-2 rounded-lg bg-[#0f1117] border border-white/[0.07] text-[#e8eaf0] text-[13px] outline-none focus:border-[#4f8ef7]/50 transition-colors placeholder:text-[#3d4560]'
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-6" onClick={handleBackdrop}>
       <div className="w-full max-w-sm bg-[#181c26] border border-white/[0.07] rounded-2xl overflow-hidden">
 
-        {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-white/[0.07]">
           <span className="font-mono font-bold text-[15px]">Settings</span>
           <button onClick={onClose} className="w-7 h-7 rounded-md bg-[#1e2336] border border-white/[0.07] text-[#6b7390] text-xs flex items-center justify-center hover:text-[#e8eaf0] transition-colors cursor-pointer">✕</button>
         </div>
 
-        {/* Connected Accounts */}
         <div className="px-5 py-4 border-b border-white/[0.07] flex flex-col gap-3">
           <div className="text-[10px] uppercase tracking-widest text-[#6b7390] font-mono">Connected Accounts</div>
 
@@ -166,11 +142,9 @@ export default function SettingsModal({ user, onClose, bskyHandle, setBskyHandle
           </div>
         </div>
 
-        {/* Security — Phone */}
         <div className="px-5 py-4 border-b border-white/[0.07] flex flex-col gap-3">
           <div className="text-[10px] uppercase tracking-widest text-[#6b7390] font-mono">Security</div>
 
-          {/* Row: label + status/action */}
           <div className="flex items-center justify-between text-[13px]">
             <span className="text-[#6b7390]">📱 Phone Verification</span>
 
@@ -197,7 +171,6 @@ export default function SettingsModal({ user, onClose, bskyHandle, setBskyHandle
             )}
           </div>
 
-          {/* Inline enter-phone form */}
           {phoneStep === 'enter_phone' && (
             <form onSubmit={handleSendCode} className="flex flex-col gap-2 mt-1">
               <div className="text-[11px] text-[#6b7390]">Enter your new number with country code (e.g. +972…)</div>
@@ -225,7 +198,6 @@ export default function SettingsModal({ user, onClose, bskyHandle, setBskyHandle
             </form>
           )}
 
-          {/* Inline enter-code form */}
           {phoneStep === 'enter_code' && (
             <form onSubmit={handleVerifyCode} className="flex flex-col gap-2 mt-1">
               <div className="text-[11px] text-[#6b7390]">Enter the 6-digit code sent to <span className="text-[#e8eaf0] font-mono">{phoneInput}</span></div>

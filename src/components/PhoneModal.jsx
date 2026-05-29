@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { API_URL } from '../apiBase'
 
 export default function PhoneModal({ onVerified, onClose }) {
   const [step, setStep] = useState('enter_phone')
@@ -10,9 +11,6 @@ export default function PhoneModal({ onVerified, onClose }) {
   function handleBackdrop(e) {
     if (e.target === e.currentTarget) onClose()
   }
-
-  // Grab the URL from your .env file
-  const API_URL = import.meta.env.VITE_API_URL;
 
   async function handleSendCode(e) {
     e.preventDefault()
